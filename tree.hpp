@@ -12,6 +12,10 @@ public:
     tree_node(T value = T());
     tree_node(tree_node<T> const& obj);
     tree_node<T> & operator=(tree_node<T> const& other);
+
+    // Operator overload for comparison
+    bool operator==(tree_node<T> const& other) const;
+    bool operator!=(tree_node<T> const& other) const;
     
     // It is public because the exterior has to access it
     T value;
@@ -75,6 +79,34 @@ tree_node<T> & tree_node<T>::operator=(tree_node<T> const& other)
     _parent = other._parent;
     _subtrees = other._subtrees; // Deep copy because everything is passed by value
 }
+
+// Comparison
+
+template <typename T>
+bool tree_node<T>::operator==(tree_node<T> const& other) const
+{
+    // We do not look at the parent pointer
+
+    // Recursively look at all the subtrees
+    {
+	auto it{subtree_begin()};
+	auto itOther{other.subtree_begin()};
+
+	for(; it != subtree_end() && itOther != other.subtree_end() ; ++it, ++itOther)
+	{
+	    if(*it != *itOther)
+		return false;
+	}
+
+    return value == other.value;
+}
+
+template <typename T>
+bool tree_node<T>::operator!=(tree_node<T> const& other) const
+{
+    return !(*this == other);
+}
+
 
 // Iterators
 template <typename T>
