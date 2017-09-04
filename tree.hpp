@@ -97,7 +97,7 @@ bool tree_node<T>::operator==(tree_node<T> const& other) const
 	    if(*it != *itOther)
 		return false;
 	}
-
+    }
     return value == other.value;
 }
 
