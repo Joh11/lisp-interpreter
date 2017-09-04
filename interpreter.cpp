@@ -10,17 +10,8 @@
 
 interpreter::interpreter()
 {
-    // Fill the function map
-    /*
-    _functions["+"] = [](std::list<parser::syntax_tree> args)
-	{
-	    int value = 0;
-	    for(auto const& arg : args)
-		value += std::stoi(arg.value);
-	    return parser::syntax_tree{std::to_string(value)};
-	};
-    */
-
+    // Fill the function map with the four classical operations : + - * /
+    
     _functions["+"] = numeric_function([](std::list<int> args)
 				       {
 					   int value = 0;
@@ -34,6 +25,34 @@ interpreter::interpreter()
 					   int value = 1;
 					   for(auto const& n : args)
 					       value *= n;
+					   return value;
+				       });
+
+    _functions["-"] = numeric_function([](std::list<int> args)
+				       {
+					   // If there is only one argument return the opposite
+					   if(args.size() == 1) return - *args.begin();
+
+					   auto it{args.begin()};
+					   int value{*it};
+
+					   for(++it ; it != args.end() ; ++it)
+					       value -= *it;
+
+					   return value;
+				       });
+
+    _functions["/"] = numeric_function([](std::list<int> args)
+				       {
+
+					   if(args.size() < 2) throw interpreter_exception(" You need at least two values for a division !");
+					   
+					   auto it{args.begin()};
+					   int value{*it};
+
+					   for(++it ; it != args.end() ; ++it)
+					       value /= *it;
+
 					   return value;
 				       });
 }
