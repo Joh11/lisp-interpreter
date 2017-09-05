@@ -3,7 +3,7 @@ CXXFLAGS = -std=c++11 -g
 
 EXEC_NAME = app
 
-OBJ = main.o parser.o interpreter.o number.o
+OBJ = main.o parser.o interpreter.o number.o dot.o tree.o
 OBJDIR = build/
 
 OBJ_WITH_DIR = $(addprefix $(OBJDIR), $(OBJ))

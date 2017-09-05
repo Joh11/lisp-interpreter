@@ -7,6 +7,7 @@
 
 #include "utils.hpp"
 #include "interpreter.hpp"
+#include "dot.hpp"
 
 interpreter::interpreter()
 {
@@ -67,13 +68,51 @@ void interpreter::fill_function()
     _functions["eq?"] = lambda{[](std::list<parser::syntax_tree> args)
 			      {
 				  if(args.size() != 2)
-				      throw interpreter_exception("eq? takes only two arguments");
+				      throw interpreter_exception("eq? takes exactly two arguments");
 				  // Just check if the two trees are equal
 				  auto second{args.begin()};
 				  ++second;
 				  int value{*args.begin() == *second ? 1 : 0};
 				  return parser::syntax_tree{std::to_string(value)};
 			      }};
+
+    // Same for cons
+    _functions["cons"] = lambda{[](std::list<parser::syntax_tree> args)
+				{
+				    if(args.size() != 2)
+					throw interpreter_exception("cons takes exactly two arguments");
+
+				    auto second{args.begin()};
+				    auto first{second++};
+
+				    return build_dot(*first, *second);
+				}};
+
+    // And car
+    _functions["car"] = lambda{[](std::list<parser::syntax_tree> args)
+			       {
+				   if(args.size() != 1)
+				       throw interpreter_exception("car takes only one argument");
+				   return car(*args.begin());
+			       }};
+    // And cdr
+    _functions["cdr"] = lambda{[](std::list<parser::syntax_tree> args)
+			       {
+				   if(args.size() != 1)
+				       throw interpreter_exception("cdr takes only one argument");
+				   return cdr(*args.begin());
+			       }};
+
+    // And atom
+    _functions["atom?"] = lambda{[](std::list<parser::syntax_tree> args)
+				 {
+				     if(args.size() != 1)
+					 throw interpreter_exception("atom? takes only one argument");
+
+				     int value{args.begin()->is_leaf() ? 1 : 0};
+
+				     return parser::syntax_tree{std::to_string(value)};
+				 }};
 }
 
 void interpreter::fill_special()

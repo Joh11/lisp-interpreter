@@ -34,6 +34,10 @@ public:
     // Add a substree
     void push_back(tree_node<T> const& subtree);
 
+    // Methods to remove subtree(s)
+    void erase(subtree_iterator position);
+    void erase(subtree_iterator first, subtree_iterator last);
+
     // Return true if there is no subtree
     bool is_leaf() const;
 
@@ -59,6 +63,9 @@ private:
 template <typename T>
 std::ostream & operator<<(std::ostream & o, tree_node<T> const& tree);
 
+// Specialization for dotted notation
+template <>
+std::ostream & operator<<(std::ostream & o, tree_node<std::string> const& tree);
 
 // Implementation of the template class
 
@@ -143,6 +150,18 @@ void tree_node<T>::push_back(tree_node<T> const& subtree)
     treeCopy._parent = this;
     
     _subtrees.push_back(treeCopy);
+}
+
+template <typename T>
+void tree_node<T>::erase(subtree_iterator position)
+{
+    _subtrees.erase(position);
+}
+
+template <typename T>
+void tree_node<T>::erase(subtree_iterator first, subtree_iterator last)
+{
+    _subtrees.erase(first, last);
 }
 
 template <typename T>

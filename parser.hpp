@@ -3,6 +3,7 @@
 
 #include <string>
 #include <stdexcept>
+#include <ostream>
 
 #include "constants.hpp"
 #include "tree.hpp"
@@ -20,7 +21,7 @@ public:
 class parser
 {
 public:
-    // An alias to simplify
+    
     using syntax_tree = tree_node<std::string>;
     
     // Tokenize a string
