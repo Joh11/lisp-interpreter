@@ -6,6 +6,7 @@
 #include <functional>
 #include <stdexcept>
 
+#include "number.hpp"
 #include "parser.hpp"
 
 class interpreter_exception : public std::runtime_error
@@ -24,18 +25,15 @@ public:
     
     // The method that will interpret the syntax tree
     parser::syntax_tree interpret(parser::syntax_tree tree);
+
+    using number = rational;
 private:
     // Alias to keep it simple
 
     // A lambda will take in input a variable number of subtrees, and return a syntax_tree
     using lambda = std::function<parser::syntax_tree(std::list<parser::syntax_tree> )>;
-
     
-    // Return true if the string contains only [0 - 9] digits
-    static bool is_number(std::string const& str);
-
-    // Same but check for leaf numbers
-    static bool is_number(parser::syntax_tree const& t);
+    static bool is_leaf_rational(parser::syntax_tree const& t);
 
     // Look in _functions
     bool is_function(std::string const& str) const;
@@ -44,7 +42,7 @@ private:
     parser::syntax_tree apply(std::string const& op, std::list<parser::syntax_tree> arguments);
 
     // Simplify the creation of numeric functions
-    lambda numeric_function(std::function<int(std::list<int>)> f);
+    lambda numeric_function(std::function<number(std::list<number>)> f);
     
     // Private member variables
 

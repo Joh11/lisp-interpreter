@@ -35,7 +35,7 @@ public:
 
     rational inverse() const;
 
-    std::ostream & display(std::ostream & stream) const {return (stream << _num << '/' << _denom);}
+    std::ostream & display(std::ostream & stream) const;
 
 private:
     // Divide each term by their gcd
@@ -45,15 +45,20 @@ private:
 };
 
 // Operators
-rational operator+(rational a, rational const& b){return a += b; }
-rational operator-(rational a, rational const& b){return a -= b; }
-rational operator*(rational a, rational const& b){return a *= b; }
-rational operator/(rational a, rational const& b){return a /= b; }
+inline rational operator+(rational a, rational const& b){return a += b; }
+inline rational operator-(rational a, rational const& b){return a -= b; }
+inline rational operator*(rational a, rational const& b){return a *= b; }
+inline rational operator/(rational a, rational const& b){return a /= b; }
 
-std::ostream & operator<<(std::ostream & stream, rational r) {return r.display(stream);}
+inline std::ostream & operator<<(std::ostream & stream, rational r) {return r.display(stream);}
 
 // Check using regex
 bool is_rational(std::string const& str);
-rational str_to_rational(std::string  str);
+rational str_to_rational(std::string const& str);
 
+namespace std
+{
+    std::string to_string(rational const& r);
+}
+    
 #endif

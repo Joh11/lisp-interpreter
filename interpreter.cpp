@@ -12,29 +12,29 @@ interpreter::interpreter()
 {
     // Fill the function map with the four classical operations : + - * /
     
-    _functions["+"] = numeric_function([](std::list<int> args)
+    _functions["+"] = numeric_function([](std::list<number> args)
 				       {
-					   int value = 0;
+					   number value{0};
 					   for(auto const& n : args)
 					       value += n;
 					   return value;
 				       });
 
-    _functions["*"] = numeric_function([](std::list<int> args)
+    _functions["*"] = numeric_function([](std::list<number> args)
 				       {
-					   int value = 1;
+					   number value{1};
 					   for(auto const& n : args)
 					       value *= n;
 					   return value;
 				       });
 
-    _functions["-"] = numeric_function([](std::list<int> args)
+    _functions["-"] = numeric_function([](std::list<number> args)
 				       {
 					   // If there is only one argument return the opposite
-					   if(args.size() == 1) return - *args.begin();
+					   if(args.size() == 1) return (-1) * *args.begin();
 
 					   auto it{args.begin()};
-					   int value{*it};
+					   number value{*it};
 
 					   for(++it ; it != args.end() ; ++it)
 					       value -= *it;
@@ -42,13 +42,13 @@ interpreter::interpreter()
 					   return value;
 				       });
 
-    _functions["/"] = numeric_function([](std::list<int> args)
+    _functions["/"] = numeric_function([](std::list<number> args)
 				       {
 
 					   if(args.size() < 2) throw interpreter_exception(" You need at least two values for a division !");
 					   
 					   auto it{args.begin()};
-					   int value{*it};
+					   number value{*it};
 
 					   for(++it ; it != args.end() ; ++it)
 					       value /= *it;
@@ -91,15 +91,12 @@ parser::syntax_tree interpreter::interpret(parser::syntax_tree tree)
     return tree;
 }
 
-
-bool interpreter::is_number(std::string const& str)
+bool interpreter::is_leaf_rational(parser::syntax_tree const& t)
 {
-    return std::regex_match(str, std::regex("\\d+"));
-}
-
-bool interpreter::is_number(parser::syntax_tree const& t)
-{
-    return t.is_leaf() && is_number(t.value);
+    bool val1{t.is_leaf()};
+    bool val2{is_rational(t.value)};
+    
+    return val1 && val2;
 }
 
 bool interpreter::is_function(std::string const& str) const
@@ -114,22 +111,22 @@ parser::syntax_tree interpreter::apply(std::string const& op, std::list<parser::
     return l(arguments);
 }
 
-interpreter::lambda interpreter::numeric_function(std::function<int(std::list<int>)> f)
+interpreter::lambda interpreter::numeric_function(std::function<number(std::list<number>)> f)
 {
     return [f](std::list<parser::syntax_tree> args)
     {
 	// Convert all arguments to int
-	std::list<int> numArgs{};
+	std::list<number> numArgs{};
 
 	for(auto const& arg : args)
 	{
-	    if(!interpreter::is_number(arg))
+	    if(!is_leaf_rational(arg))
 	    {
 		// The given argument is not a number : throw exception
 		throw interpreter_exception(" The given argument is not a number. Error");
 	    }
 
-	    numArgs.push_back(std::stoi(arg.value));
+	    numArgs.push_back(str_to_rational(arg.value));
 	}
 
 	return std::to_string(f(numArgs));

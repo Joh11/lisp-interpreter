@@ -1,5 +1,7 @@
 #include <stdexcept>
 #include <regex>
+#include <sstream>
+#include <iostream>
 
 #include "number.hpp"
 
@@ -16,6 +18,7 @@ rational::rational(int numerator, int denominator) : _num(numerator), _denom(den
 rational& rational::operator+=(rational const& r)
 {
     _num = _num * r._denom + r._num * _denom;
+    _denom *= r._denom;
     reduce();
 
     return *this;
@@ -61,6 +64,15 @@ rational rational::inverse() const
     return rational(_denom, _num);
 }
 
+std::ostream & rational::display(std::ostream & stream) const
+{
+    stream << _num;
+    if(_denom != 1)
+	stream << '/' << _denom;
+
+    return stream;
+}
+
 void rational::reduce()
 {
     int g{gcd(_num, _denom)};
@@ -81,29 +93,43 @@ bool is_rational(std::string const& str)
     return std::regex_match(str, std::regex("-?\\d+/?\\d*"));
 }
 
-rational str_to_rational(std::string str)
+rational str_to_rational(std::string const& str)
 {
-    if(!is_rational(str))
+    std::string strCopy{str};
+    
+    if(!is_rational(strCopy))
 	throw std::runtime_error("Not a rational !");
 
     int num = 1;
     
-    if(str[0] == '-')
+    if(strCopy[0] == '-')
     {
 	num = -1;
-	str = str.substr(1, std::string::npos);
+	strCopy = str.substr(1, std::string::npos);
     }
 
-    size_t slashPos{str.find('/')};
+    size_t slashPos{strCopy.find('/')};
 
     if(slashPos == std::string::npos)
     {
 	// It is only an integer
-	return rational{num * std::stoi(str)};
+	return rational{num * std::stoi(strCopy)};
     }
 
-    num *= std::stoi(str.substr(0, slashPos - 1));
-    int denom{std::stoi(str.substr(slashPos + 1, std::string::npos))};
+    num *= std::stoi(strCopy.substr(0, slashPos));
+    int denom{std::stoi(strCopy.substr(slashPos + 1, std::string::npos))};
 
     return rational{num, denom};
+}
+
+namespace std
+{
+    std::string to_string(rational const& r)
+    {
+	std::stringstream ss;
+
+	r.display(ss);
+
+	return ss.str();
+    }
 }
