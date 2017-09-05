@@ -32,20 +32,30 @@ private:
 
     // A lambda will take in input a variable number of subtrees, and return a syntax_tree
     using lambda = std::function<parser::syntax_tree(std::list<parser::syntax_tree> )>;
+
+    // Two methods to lighten the constructor
+    void fill_special();
+    void fill_function();
     
     static bool is_leaf_rational(parser::syntax_tree const& t);
+
+    // Look in _specials
+    bool is_special(std::string const& str) const;
 
     // Look in _functions
     bool is_function(std::string const& str) const;
 
-    // Apply using lambdas in _functions
-    parser::syntax_tree apply(std::string const& op, std::list<parser::syntax_tree> arguments);
+    // Build the argument list : take all branches but the first one
+    std::list<parser::syntax_tree> build_args(parser::syntax_tree const& t);
 
     // Simplify the creation of numeric functions
     lambda numeric_function(std::function<number(std::list<number>)> f);
     
     // Private member variables
 
+    // A map for special forms
+    std::map<std::string, lambda> _specials;
+    
     // A map of functions
     std::map<std::string, lambda> _functions;
 
