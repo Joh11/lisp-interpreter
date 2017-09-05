@@ -33,6 +33,7 @@ public:
 
     // Add a substree
     void push_back(tree_node<T> const& subtree);
+    void push_front(tree_node<T> const& subtree);
 
     // Methods to remove subtree(s)
     void erase(subtree_iterator position);
@@ -150,6 +151,17 @@ void tree_node<T>::push_back(tree_node<T> const& subtree)
     treeCopy._parent = this;
     
     _subtrees.push_back(treeCopy);
+}
+
+template <typename T>
+void tree_node<T>::push_front(tree_node<T> const& subtree)
+{
+    // Give it a pointer to this as parent
+    tree_node<T> treeCopy{subtree};
+
+    treeCopy._parent = this;
+    
+    _subtrees.push_front(treeCopy);
 }
 
 template <typename T>

@@ -39,11 +39,17 @@ private:
     
     static bool is_leaf_rational(parser::syntax_tree const& t);
 
+    // Bind the given variable name to the given tree
+    void bind(std::string const& name, parser::syntax_tree const& tree);
+
     // Look in _specials
     bool is_special(std::string const& str) const;
 
     // Look in _functions
     bool is_function(std::string const& str) const;
+
+    // Look in _variable
+    bool is_variable(std::string const& str) const;
 
     // Build the argument list : take all branches but the first one
     std::list<parser::syntax_tree> build_args(parser::syntax_tree const& t);
@@ -59,6 +65,8 @@ private:
     // A map of functions
     std::map<std::string, lambda> _functions;
 
+    // A map for defined variables
+    std::map<std::string, parser::syntax_tree> _variables;
 };
 
 #endif

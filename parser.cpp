@@ -30,6 +30,10 @@ token_table parser::tokenize(std::string input)
 		}
 	    }
 	}
+
+	// To take care of the case where there is no final space
+	if(!currentToken.empty())
+	    tokens.push_back(currentToken);
     }
 
     return tokens;
@@ -83,7 +87,7 @@ parser::syntax_tree parser::parenthesize(token_table const& tokens)
 
     if(subtreeStack.size() != 1)
 	throw syntax_error("There are unbound subtrees in the parse stack. Check your parenthesis !");
-    if(subtreeStack.top().nb_children() != 1)
+    if(subtreeStack.top().nb_children() > 1)
 	throw syntax_error("There are several roots in the syntactic tree. You should enter only one instruction at a time !");
 
     // Everything should be ok so return the syntax tree

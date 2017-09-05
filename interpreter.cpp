@@ -123,6 +123,21 @@ void interpreter::fill_special()
 					throw interpreter_exception("quote takes only one argument");
 				    return *args.begin();
 				}};
+
+    _specials["define"] = lambda{[this](std::list<parser::syntax_tree> args)
+				 {
+				     if(args.size() != 2)
+					 throw interpreter_exception{"define takes exactly two arguments"};
+
+				     if(!args.begin()->is_leaf())
+					 throw interpreter_exception{"The first argument of define must be a symbol"};
+				     
+				     // Bind the name of the first argument to the expression given in the second argument
+				     auto it{args.begin()};
+				     bind(args.begin()->value, *(++it));
+
+				     return *args.begin();
+				 }};
 }
 
 parser::syntax_tree interpreter::interpret(parser::syntax_tree tree)
@@ -130,6 +145,12 @@ parser::syntax_tree interpreter::interpret(parser::syntax_tree tree)
     // If the tree is a leaf we cannot do anything so quit
     if(tree.is_leaf())
     {
+	// Unless the leaf is a variable
+	if(is_variable(tree.value))
+	{
+	    return interpret(_variables[tree.value]);
+	}
+	
 	return tree;
     }
 
@@ -157,6 +178,15 @@ parser::syntax_tree interpreter::interpret(parser::syntax_tree tree)
 	    // Then apply
 	    tree = _functions[name](args);
 	}
+	else if(is_variable(name))
+	{
+	    // Replace the name with its value
+	    tree.erase(tree.subtree_begin());
+	    tree.push_front(_variables[name]);
+
+	    // And rerun the interpreter
+	    tree = interpret(tree);
+	}
 	else
 	{
 	    // The leaf was not recognized as special form nor function, so there is an error
@@ -183,6 +213,16 @@ bool interpreter::is_special(std::string const& str) const
 bool interpreter::is_function(std::string const& str) const
 {
     return _functions.find(str) != _functions.end();
+}
+
+bool interpreter::is_variable(std::string const& str) const
+{
+    return _variables.find(str) != _variables.end();
+}
+
+void interpreter::bind(std::string const& name, parser::syntax_tree const& tree)
+{
+    _variables[name] = parser::syntax_tree{tree};
 }
 
 std::list<parser::syntax_tree> interpreter::build_args(parser::syntax_tree const& t)
